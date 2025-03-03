@@ -50,11 +50,23 @@ class TextSplitter {
    * so here we want to allow override of the default 1000, but up to the models maximum, which is
    * sometimes user defined.
    */
+  /**
+   * 【核心功能】确定文本分块的最大尺寸
+   * ------------------------------------------------
+   * 这个静态方法用于确定文本分块的最大长度，考虑了用户偏好和嵌入模型的限制。
+   * 嵌入模型有硬性的长度限制，就像LLM上下文一样，不能超过。
+   * ------------------------------------------------
+   * @param {number|null} preferred - 用户偏好的块大小
+   * @param {number} embedderLimit - 嵌入模型的最大限制，默认为1000
+   * @returns {number} - 最终确定的块大小
+   */
   static determineMaxChunkSize(preferred = null, embedderLimit = 1000) {
+    // 如果preferred为null或NaN，则使用embedderLimit作为默认值
     const prefValue = isNullOrNaN(preferred)
       ? Number(embedderLimit)
       : Number(preferred);
     const limit = Number(embedderLimit);
+    // 如果用户偏好的值超过了模型限制，输出警告并使用模型限制
     if (prefValue > limit)
       console.log(
         `\x1b[43m[WARN]\x1b[0m Text splitter chunk length of ${prefValue} exceeds embedder model max of ${embedderLimit}. Will use ${embedderLimit}.`
@@ -139,48 +151,36 @@ class TextSplitter {
   }
 
   #setSplitter(config = {}) {
-    // if (!config?.splitByFilename) {// TODO do something when specific extension is present? }
-    return new RecursiveSplitter({
+    // 根据配置选择使用空白行分块器或递归分块器
+    const BlankLineSplitter = require('./BlankLineSplitter');
+    const RecursiveSplitter = require('./RecursiveSplitter');
+    const splitterConfig = {
       chunkSize: isNaN(config?.chunkSize) ? 1_000 : Number(config?.chunkSize),
       chunkOverlap: isNaN(config?.chunkOverlap)
         ? 20
         : Number(config?.chunkOverlap),
       chunkHeader: this.stringifyHeader(),
-    });
+    };
+
+    // 如果指定使用递归分块器，则使用RecursiveSplitter
+    if (config?.useRecursiveSplitter) {
+      return new RecursiveSplitter(splitterConfig);
+    }
+
+    // 默认使用BlankLineSplitter
+    return new BlankLineSplitter(splitterConfig);
   }
 
+  /**
+   * 【核心功能】分割文本为多个块
+   * ------------------------------------------------
+   * 这是文本分块的主要入口方法，将文档文本分割成多个小块
+   * ------------------------------------------------
+   * @param {string} documentText - 需要分割的文档文本
+   * @returns {Promise<string[]>} - 分割后的文本块数组
+   */
   async splitText(documentText) {
     return this.#splitter._splitText(documentText);
-  }
-}
-
-// Wrapper for Langchain default RecursiveCharacterTextSplitter class.
-class RecursiveSplitter {
-  constructor({ chunkSize, chunkOverlap, chunkHeader = null }) {
-    const {
-      RecursiveCharacterTextSplitter,
-    } = require("@langchain/textsplitters");
-    this.log(`Will split with`, { chunkSize, chunkOverlap });
-    this.chunkHeader = chunkHeader;
-    this.engine = new RecursiveCharacterTextSplitter({
-      chunkSize,
-      chunkOverlap,
-    });
-  }
-
-  log(text, ...args) {
-    console.log(`\x1b[35m[RecursiveSplitter]\x1b[0m ${text}`, ...args);
-  }
-
-  async _splitText(documentText) {
-    if (!this.chunkHeader) return this.engine.splitText(documentText);
-    const strings = await this.engine.splitText(documentText);
-    const documents = await this.engine.createDocuments(strings, [], {
-      chunkHeader: this.chunkHeader,
-    });
-    return documents
-      .filter((doc) => !!doc.pageContent)
-      .map((doc) => doc.pageContent);
   }
 }
 
