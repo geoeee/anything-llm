@@ -15,8 +15,13 @@ if (__dirname.indexOf("app.asar") >= 0) {
 const app = express();
 const port = 3000;
 
-console.log("[web static path]", path.join(__dirname, "../frontend/dist"));
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+const staticPath = path.join(__dirname, "../frontend/dist");
+console.log("[web static path]", staticPath);
+app.use(express.static(staticPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(staticPath, "index.html"));
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
