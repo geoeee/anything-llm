@@ -23,8 +23,7 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
   } else {
-    console.log('Production build path:', path.join(__dirname, '../frontend/dist/index.html'));
-    mainWindow.loadFile(path.join(__dirname, '../frontend/dist/index.html'));
+    mainWindow.loadURL('http://localhost:3000');
   }
 
   mainWindow.on('closed', () => {
@@ -48,6 +47,14 @@ const serverProcess = fork(path.join(__dirname, '../server/index.js'), {
     NODE_ENV: 'production'
   }
 });
+
+const frontendServerProcess = fork(path.join(__dirname, 'frontend-server.js'), {
+  env: {
+    ...process.env,
+    NODE_ENV: 'production'
+  }
+});
+trackProcess(frontendServerProcess);
 trackProcess(serverProcess);
 
 console.log('Server process started', "NODE ENV: ", process.env.NODE_ENV);
@@ -83,6 +90,9 @@ app.on('before-quit', () => {
       proc.kill('SIGTERM');
     }
   });
+  if (frontendServerProcess && !frontendServerProcess.killed) {
+    frontendServerProcess.kill('SIGTERM');
+  }
 });
 
 process.on('exit', () => {
@@ -91,6 +101,9 @@ process.on('exit', () => {
       proc.kill('SIGKILL');
     }
   });
+  if (frontendServerProcess && !frontendServerProcess.killed) {
+    frontendServerProcess.kill('SIGKILL');
+  }
 });
 
 app.on('activate', () => {

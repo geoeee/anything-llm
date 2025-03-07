@@ -46,5 +46,8 @@
       "collector/**/*"
     ]
   },
-  "private": false
+  "private": false,
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
