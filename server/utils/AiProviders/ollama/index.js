@@ -1,3 +1,5 @@
+/* eslint-disable no-async-promise-executor */
+/* eslint-disable no-prototype-builtins */
 const {
   writeResponseChunk,
   clientAbortedHandler,

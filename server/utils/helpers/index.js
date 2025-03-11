@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /**
  * File Attachment for automatic upload on the chat container page.
  * @typedef Attachment

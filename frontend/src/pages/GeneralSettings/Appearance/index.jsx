@@ -34,15 +34,15 @@ export default function Appearance() {
             </p>
           </div>
           <ThemePreference />
-          <LanguagePreference />
+          {/* <LanguagePreference /> */}
           <MessageDirection />
-          <ShowScrollbar />
-          <CustomLogo />
+          {/* <ShowScrollbar /> */}
+          {/* <CustomLogo />
           <CustomAppName />
           <CustomMessages />
           <FooterCustomization />
           <SupportEmail />
-          <CustomSiteSettings />
+          <CustomSiteSettings /> */}
         </div>
       </div>
     </div>
