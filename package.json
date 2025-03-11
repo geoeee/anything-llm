@@ -51,8 +51,8 @@
         ]
       },
       {
-        "from": "frontend/dist",
-        "to": "frontend/dist",
+        "from": "collector",
+        "to": "collector",
         "filter": [
           "**/*"
         ]
@@ -69,14 +69,6 @@
         "to": "ollama",
         "filter": [
           "**/*"
-        ]
-      },
-      {
-        "from": "ollama",
-        "to": "ollama",
-        "filter": [
-          "**/*",
-          "!**/*.md"
         ]
       }
     ],
