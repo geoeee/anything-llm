@@ -5,6 +5,7 @@ import { OLLAMA_COMMON_URLS } from "@/utils/constants";
 import { CaretDown, CaretUp, Info } from "@phosphor-icons/react";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
 import { Tooltip } from "react-tooltip";
+import DeepSeekModels from "@/components/LLMSelection/OllamaLLMOptions/ModelCard";
 
 export default function OllamaLLMOptions({ settings }) {
   const {
@@ -220,6 +221,8 @@ export default function OllamaLLMOptions({ settings }) {
           </div>
         </div>
       </div>
+
+      <DeepSeekModels />
     </div>
   );
 }
@@ -268,7 +271,7 @@ function OllamaLLMModelSelection({
           className="border-none bg-theme-settings-input-bg border-gray-500 text-white text-sm rounded-lg block w-full p-2.5"
         >
           <option disabled={true} selected={true}>
-            {!!basePath
+            {basePath
               ? "--loading available models--"
               : "Enter Ollama URL first"}
           </option>

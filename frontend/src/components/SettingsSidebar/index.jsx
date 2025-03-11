@@ -158,7 +158,7 @@ export default function SettingsSidebar() {
               <div className="h-auto sidebar-items">
                 <div className="flex flex-col gap-y-2 pb-[60px] overflow-y-scroll no-scroll">
                   <SidebarOptions user={user} t={t} />
-                  <div className="h-[1.5px] bg-[#3D4147] mx-3 mt-[14px]" />
+                  {/* <div className="h-[1.5px] bg-[#3D4147] mx-3 mt-[14px]" />
                   <SupportEmail />
                   <Link
                     hidden={
@@ -168,7 +168,7 @@ export default function SettingsSidebar() {
                     className="text-theme-text-secondary hover:text-white hover:light:text-theme-text-primary text-xs leading-[18px] mx-3"
                   >
                     {t("settings.privacy")}
-                  </Link>
+                  </Link> */}
                 </div>
               </div>
             </div>
@@ -223,39 +223,39 @@ const SidebarOptions = ({ user = null, t }) => (
               flex: true,
               roles: ["admin"],
             },
-            {
-              btnText: t("settings.vector-database"),
-              href: paths.settings.vectorDatabase(),
-              flex: true,
-              roles: ["admin"],
-            },
-            {
-              btnText: t("settings.embedder"),
-              href: paths.settings.embedder.modelPreference(),
-              flex: true,
-              roles: ["admin"],
-            },
-            {
-              btnText: t("settings.text-splitting"),
-              href: paths.settings.embedder.chunkingPreference(),
-              flex: true,
-              roles: ["admin"],
-            },
-            {
-              btnText: t("settings.voice-speech"),
-              href: paths.settings.audioPreference(),
-              flex: true,
-              roles: ["admin"],
-            },
-            {
-              btnText: t("settings.transcription"),
-              href: paths.settings.transcriptionPreference(),
-              flex: true,
-              roles: ["admin"],
-            },
+            // {
+            //   btnText: t("settings.vector-database"),
+            //   href: paths.settings.vectorDatabase(),
+            //   flex: true,
+            //   roles: ["admin"],
+            // },
+            // {
+            //   btnText: t("settings.embedder"),
+            //   href: paths.settings.embedder.modelPreference(),
+            //   flex: true,
+            //   roles: ["admin"],
+            // },
+            // {
+            //   btnText: t("settings.text-splitting"),
+            //   href: paths.settings.embedder.chunkingPreference(),
+            //   flex: true,
+            //   roles: ["admin"],
+            // },
+            // {
+            //   btnText: t("settings.voice-speech"),
+            //   href: paths.settings.audioPreference(),
+            //   flex: true,
+            //   roles: ["admin"],
+            // },
+            // {
+            //   btnText: t("settings.transcription"),
+            //   href: paths.settings.transcriptionPreference(),
+            //   flex: true,
+            //   roles: ["admin"],
+            // },
           ]}
         />
-        <Option
+        {/* <Option
           btnText={t("settings.admin")}
           icon={<UserCircleGear className="h-5 w-5 flex-shrink-0" />}
           user={user}
@@ -315,7 +315,7 @@ const SidebarOptions = ({ user = null, t }) => (
               roles: ["admin"],
             },
           ]}
-        />
+        /> */}
         <Option
           btnText={t("settings.customization")}
           icon={<PencilSimpleLine className="h-5 w-5 flex-shrink-0" />}
@@ -324,7 +324,7 @@ const SidebarOptions = ({ user = null, t }) => (
           flex={true}
           roles={["admin", "manager"]}
         />
-        <Option
+        {/* <Option
           btnText={t("settings.tools")}
           icon={<Toolbox className="h-5 w-5 flex-shrink-0" />}
           user={user}
@@ -370,8 +370,8 @@ const SidebarOptions = ({ user = null, t }) => (
           flex={true}
           roles={["admin", "manager"]}
           hidden={user?.role}
-        />
-        <HoldToReveal key="exp_features">
+        /> */}
+        {/* <HoldToReveal key="exp_features">
           <Option
             btnText={t("settings.experimental-features")}
             icon={<Flask className="h-5 w-5 flex-shrink-0" />}
@@ -380,7 +380,7 @@ const SidebarOptions = ({ user = null, t }) => (
             flex={true}
             roles={["admin"]}
           />
-        </HoldToReveal>
+        </HoldToReveal> */}
       </>
     )}
   </CanViewChatHistoryProvider>

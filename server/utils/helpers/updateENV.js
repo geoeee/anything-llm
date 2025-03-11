@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const { resetAllVectorStores } = require("../vectorStore/resetAllVectorStores");
 
 const KEY_MAPPING = {
