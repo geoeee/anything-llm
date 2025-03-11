@@ -20,12 +20,7 @@ let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 800,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
+    height: 800
   });
 
   // 加载Vite开发服务器或生产构建
