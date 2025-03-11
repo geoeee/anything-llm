@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fork } from 'child_process';
+=======
+import { app, BrowserWindow } from "electron";
+import path from "path";
+import { fileURLToPath } from "url";
+import { fork, spawn } from "child_process";
+>>>>>>> d2b3752f (add ollama impl)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -74,6 +81,22 @@ trackProcess(collectorProcess);
 
 collectorProcess.on('error', (err) => {
   console.error('Collector process error:', err);
+});
+
+const ollamaProcess = spawn(
+  path.join(__dirname, "../ollama/ollama.exe"),
+  ["serve"],
+  {
+    env: {
+      ...process.env,
+      OLLAMA_HOST: "0.0.0.0:11435"
+    }
+  }
+);
+trackProcess(ollamaProcess);
+
+ollamaProcess.on("error", (err) => {
+  console.error("Ollama process error:", err);
 });
 
 app.whenReady().then(createWindow);
