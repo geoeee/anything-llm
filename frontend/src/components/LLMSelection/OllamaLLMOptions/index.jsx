@@ -12,7 +12,7 @@ const SUPPORT_MODELS = [
     category: "DeepSeek",
     models: [
       {
-        id: "deepseek-r1:1.5",
+        id: "deepseek-r1:1.5b",
         name: "DeepSeek-R1:1.5B",
         size: "1.1GB",
         description:
