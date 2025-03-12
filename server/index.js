@@ -53,8 +53,9 @@ if (process.env.ENABLE_HTTPS) {
 }
 
 loadConf({
-  // LLM_PROVIDER: "ollama",
-  // OLLAMA_BASE_PATH: "http://127.0.0.1:11434",
+  LLM_PROVIDER: "ollama",
+  OLLAMA_BASE_PATH: "http://127.0.0.1:11434",
+  VECTOR_DB: "lancedb",
   // OLLAMA_MODEL_PREF: "qwen2.5:0.5b",
 });
 

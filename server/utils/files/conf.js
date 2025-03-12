@@ -10,6 +10,9 @@ if (!fs.existsSync(confPath)) {
 }
 
 const loadConf = (defConf = {}) => {
+  for (const key in defConf) {
+    process.env[key] = defConf[key];
+  }
   if (fs.existsSync(confFile)) {
     const conf = fs.readFileSync(confFile);
     const envs = JSON.parse(conf);
@@ -18,9 +21,6 @@ const loadConf = (defConf = {}) => {
     }
     return envs;
   } else {
-    for (const key in defConf) {
-      process.env[key] = defConf[key];
-    }
     return defConf;
   }
 };
