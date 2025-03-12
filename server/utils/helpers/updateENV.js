@@ -1,5 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 const { resetAllVectorStores } = require("../vectorStore/resetAllVectorStores");
+const { saveConf } = require("../files/conf");
 
 const KEY_MAPPING = {
   LLMProvider: {
@@ -891,6 +892,9 @@ async function updateENV(newENVs = {}, force = false, userId = null) {
 
     newValues[key] = nextValue;
     process.env[envKey] = nextValue;
+    saveConf({
+      [envKey]: nextValue,
+    });
 
     for (const postUpdateFunc of postUpdate)
       await postUpdateFunc(key, prevValue, nextValue);

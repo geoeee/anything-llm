@@ -1,10 +1,12 @@
 process.env.NODE_ENV === "development"
   ? require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` })
   : require("dotenv").config();
+const { v4: uuidv4 } = require("uuid");
 const { viewLocalFiles, normalizePath, isWithin } = require("../utils/files");
 const { purgeDocument, purgeFolder } = require("../utils/files/purgeDocument");
-const { getVectorDbClass } = require("../utils/helpers");
+const { getVectorDbClass, getLLMProvider } = require("../utils/helpers");
 const { updateENV, dumpENV } = require("../utils/helpers/updateENV");
+const { writeResponseChunk } = require("../utils/helpers/chat/responses");
 const {
   reqBody,
   makeJWT,
@@ -353,7 +355,7 @@ function systemEndpoints(app) {
       try {
         const query = queryParams(request);
         const VectorDb = getVectorDbClass();
-        const vectorCount = !!query.slug
+        const vectorCount = query.slug
           ? await VectorDb.namespaceCount(query.slug)
           : await VectorDb.totalVectors();
         response.status(200).json({ vectorCount });
@@ -950,6 +952,87 @@ function systemEndpoints(app) {
       }
     }
   );
+
+  app.post("/system/delete_model", async (request, response) => {
+    const {
+      provider,
+      modelName,
+      apiKey = null,
+      basePath = null,
+    } = reqBody(request);
+    try {
+      const providerInst = getLLMProvider(provider, apiKey, basePath);
+      if (!providerInst?.deleteModel || !modelName) {
+        response.status(400).json({ success: false, error: "Invalid Model" });
+        return;
+      }
+      await providerInst.deleteModel(modelName);
+
+      return response.status(200).end();
+    } catch (error) {
+      console.error(error);
+      response.status(500).end();
+    }
+  });
+
+  app.post("/system/download_model", async (request, response) => {
+    const id = uuidv4();
+    try {
+      const {
+        provider,
+        modelName,
+        apiKey = null,
+        basePath = null,
+      } = reqBody(request);
+      const providerInst = getLLMProvider(provider, apiKey, basePath);
+
+      if (!providerInst?.downloadModel || !modelName) {
+        response.status(400).json({
+          id,
+          type: "abort",
+          textResponse: null,
+          sources: [],
+          close: true,
+          error: "Cannot download model.",
+        });
+        return;
+      }
+
+      response.setHeader("Cache-Control", "no-cache");
+      response.setHeader("Content-Type", "text/event-stream");
+      response.setHeader("Access-Control-Allow-Origin", "*");
+      response.setHeader("Connection", "keep-alive");
+      response.flushHeaders();
+
+      await providerInst.downloadModel(modelName, (progress = {}) => {
+        writeResponseChunk(response, {
+          id,
+          type: "progress",
+          textResponse: null,
+          sources: [
+            {
+              ...progress,
+              modelName,
+            },
+          ],
+          close: false,
+        });
+      });
+
+      response.end();
+    } catch (e) {
+      console.error(e);
+      writeResponseChunk(response, {
+        id,
+        type: "abort",
+        textResponse: null,
+        sources: [],
+        close: true,
+        error: e.message,
+      });
+      response.end();
+    }
+  });
 
   app.post(
     "/system/custom-models",

@@ -352,7 +352,7 @@ async function ollamaAIModels(basePath = null, _authToken = null) {
     .then((data) => data?.models || [])
     .then((models) =>
       models.map((model) => {
-        return { id: model.name };
+        return { id: model.name, size: model.size, name: model.name };
       })
     )
     .catch((e) => {

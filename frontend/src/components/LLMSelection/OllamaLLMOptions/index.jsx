@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import System from "@/models/system";
 import PreLoader from "@/components/Preloader";
 import { OLLAMA_COMMON_URLS } from "@/utils/constants";
@@ -7,9 +7,68 @@ import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDis
 import { Tooltip } from "react-tooltip";
 import DeepSeekModels from "@/components/LLMSelection/OllamaLLMOptions/ModelCard";
 
+const SUPPORT_MODELS = [
+  {
+    category: "DeepSeek",
+    models: [
+      {
+        id: "deepseek-r1:1.5",
+        name: "DeepSeek-R1:1.5B",
+        size: "1.1GB",
+        description:
+          "DeepSeek's first-generation of reasoning models with comparable performance.",
+      },
+      {
+        id: "deepseek-r1:7b",
+        name: "DeepSeek-R1:7B",
+        size: "4.9GB",
+        description:
+          "DeepSeek's first-generation of reasoning models with comparable performance and improved scalability.",
+      },
+      {
+        id: "deepseek-r1:14b",
+        name: "DeepSeek-R1:14B",
+        size: "9.0GB",
+        description:
+          "DeepSeek's first-generation of reasoning models with enhanced capabilities for complex problem-solving.",
+      },
+    ],
+  },
+  {
+    category: "Qwen",
+    models: [
+      {
+        id: "qwen2.5:0.5b",
+        name: "Qwen-2.5:0.5b",
+        size: "0.7GB",
+        description:
+          "DeepSeek's first-generation of reasoning models with comparable performance.",
+      },
+      {
+        id: "qwen2.5:1.5b",
+        name: "Qwen-2.5:1.5b",
+        size: "1.1GB",
+        description:
+          "DeepSeek's first-generation of reasoning models with comparable performance and improved scalability.",
+      },
+    ],
+  },
+];
+
+const DEFAULT_CONF = {
+  LLMProvider: "ollama",
+  OllamaLLMModelPref: "",
+  OllamaLLMTokenLimit: "4096",
+  OllamaLLMBasePath: "http://127.0.0.1:11434",
+  OllamaLLMPerformanceMode: "base",
+  OllamaLLMKeepAliveSeconds: "300",
+  OllamaLLMAuthToken: "",
+};
+
 export default function OllamaLLMOptions({ settings }) {
+  const [tempSettings, setTempSettings] = useState(settings || {});
   const {
-    autoDetecting: loading,
+    autoDetecting,
     basePath,
     basePathValue,
     authToken,
@@ -19,20 +78,104 @@ export default function OllamaLLMOptions({ settings }) {
     handleAutoDetectClick,
   } = useProviderEndpointAutoDiscovery({
     provider: "ollama",
-    initialBasePath: settings?.OllamaLLMBasePath,
-    initialAuthToken: settings?.OllamaLLMAuthToken,
+    initialBasePath: tempSettings?.OllamaLLMBasePath,
+    initialAuthToken: tempSettings?.OllamaLLMAuthToken,
     ENDPOINTS: OLLAMA_COMMON_URLS,
   });
   const [performanceMode, setPerformanceMode] = useState(
-    settings?.OllamaLLMPerformanceMode || "base"
+    tempSettings?.OllamaLLMPerformanceMode || "base"
   );
   const [maxTokens, setMaxTokens] = useState(
-    settings?.OllamaLLMTokenLimit || 4096
+    tempSettings?.OllamaLLMTokenLimit || 4096
   );
+  const [customModels, setCustomModels] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [downloadInfo, setDownloadInfo] = useState({});
+
+  useState(() => {
+    setTempSettings(settings);
+  }, settings);
+
+  const findCustomModels = useCallback(async () => {
+    if (!basePath?.value) {
+      setCustomModels([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const { models } = await System.customModels(
+        "ollama",
+        authToken?.value,
+        basePath?.value
+      );
+      setCustomModels(models || []);
+    } catch (error) {
+      console.error("Failed to fetch custom models:", error);
+      setCustomModels([]);
+    }
+    setLoading(false);
+  }, [basePath?.value]);
+
+  useEffect(() => {
+    findCustomModels();
+  }, [findCustomModels]);
+
+  const onDelete = async (modelName) => {
+    await System.deleteModel(
+      "ollama",
+      modelName,
+      authToken.value,
+      basePath.value
+    );
+    await findCustomModels();
+  };
+
+  const onActivate = async (modelName) => {
+    await System.updateSystem({
+      ...DEFAULT_CONF,
+      OllamaLLMModelPref: modelName,
+    });
+    const _settings = await System.keys();
+    setTempSettings(_settings);
+  };
+
+  const onDownload = async (modelName) => {
+    setDownloadInfo({
+      modelName,
+      percent: 0,
+    });
+    await System.downloadModel(
+      "ollama",
+      modelName,
+      authToken.value,
+      basePath.value,
+      (data) => {
+        const source = data?.sources?.[0];
+        console.log(source);
+        if (source.status.includes("pulling")) {
+          source.status = "下载中";
+          source.showPercent = true;
+        } else if (source.status.includes("verifying")) {
+          source.status = "校验中";
+        } else if (source.status.includes("writing")) {
+          source.status = "写入中";
+        } else if (source.status.includes("success")) {
+          source.status = "下载完成";
+        } else {
+          source.status = "--";
+        }
+
+        setDownloadInfo(source || {});
+      }
+    );
+    setDownloadInfo({});
+    await findCustomModels();
+  };
 
   return (
     <div className="w-full flex flex-col gap-y-7">
-      <div className="w-full flex items-start gap-[36px] mt-1.5">
+      {/* <div className="w-full flex items-start gap-[36px] mt-1.5">
         <OllamaLLMModelSelection
           settings={settings}
           basePath={basePath.value}
@@ -220,9 +363,22 @@ export default function OllamaLLMOptions({ settings }) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <DeepSeekModels />
+      {SUPPORT_MODELS.map((category) => {
+        return (
+          <DeepSeekModels
+            key={category.category}
+            category={category}
+            activate={tempSettings.OllamaLLMModelPref}
+            availableModels={customModels.map((model) => model.name)}
+            downloadInfo={downloadInfo}
+            onDelete={onDelete}
+            onActivate={onActivate}
+            onDownload={onDownload}
+          />
+        );
+      })}
     </div>
   );
 }

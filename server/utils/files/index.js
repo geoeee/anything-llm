@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const fs = require("fs");
 const path = require("path");
 const { v5: uuidv5 } = require("uuid");
@@ -6,11 +7,17 @@ const { DocumentSyncQueue } = require("../../models/documentSyncQueue");
 const documentsPath =
   process.env.NODE_ENV === "development"
     ? path.resolve(__dirname, `../../storage/documents`)
-    : path.resolve(process.env.STORAGE_DIR || path.resolve(__dirname, `../../storage`), `documents`);
+    : path.resolve(
+        process.env.STORAGE_DIR || path.resolve(__dirname, `../../storage`),
+        `documents`
+      );
 const vectorCachePath =
   process.env.NODE_ENV === "development"
     ? path.resolve(__dirname, `../../storage/vector-cache`)
-    : path.resolve(process.env.STORAGE_DIR || path.resolve(__dirname, `../../storage`), `vector-cache`);
+    : path.resolve(
+        process.env.STORAGE_DIR || path.resolve(__dirname, `../../storage`),
+        `vector-cache`
+      );
 
 // logging the paths
 

@@ -408,10 +408,10 @@ export default function GeneralLLMPreference() {
                   </CTAButton>
                 )}
               </div>
-              <div className="text-base font-bold text-white mt-6 mb-4">
+              {/* <div className="text-base font-bold text-white mt-6 mb-4">
                 {t("llm.provider")}
-              </div>
-              <div className="relative">
+              </div> */}
+              {/* <div className="relative">
                 {searchMenuOpen && (
                   <div
                     className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-70 backdrop-blur-sm z-10"
@@ -492,7 +492,7 @@ export default function GeneralLLMPreference() {
                     />
                   </button>
                 )}
-              </div>
+              </div> */}
               <div
                 onChange={() => setHasChanges(true)}
                 className="mt-4 flex flex-col gap-y-1"

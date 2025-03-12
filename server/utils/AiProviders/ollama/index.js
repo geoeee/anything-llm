@@ -208,6 +208,48 @@ class OllamaAILLM {
     return measuredStreamRequest;
   }
 
+  async deleteModel(modelName) {
+    await this.client.delete({ model: modelName });
+  }
+
+  async downloadModel(modelName, progressFunc = () => null) {
+    console.log(`downloading ${modelName}...`);
+    // let currentDigestDone = false;
+    const stream = await this.client.pull({ model: modelName, stream: true });
+    for await (const part of stream) {
+      if (part.digest) {
+        let percent = 0;
+        if (part.completed && part.total) {
+          percent = Math.round((part.completed / part.total) * 100);
+        }
+        // process.stdout.clearLine(0);
+        // process.stdout.cursorTo(0);
+        // process.stdout.write(`${part.status} ${percent}%...`);
+        progressFunc({
+          percent,
+          total: part.total,
+          completed: part.completed,
+          status: part.status,
+          digest: part.digest,
+        });
+        // if (percent === 100 && !currentDigestDone) {
+        //   console.log();
+        //   currentDigestDone = true;
+        // } else {
+        //   currentDigestDone = false;
+        // }
+      } else {
+        progressFunc({
+          total: part.total,
+          completed: part.completed,
+          status: part.status,
+          digest: part.digest,
+        });
+        // console.log(part.status);
+      }
+    }
+  }
+
   /**
    * Handles streaming responses from Ollama.
    * @param {import("express").Response} response

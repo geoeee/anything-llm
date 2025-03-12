@@ -1,3 +1,5 @@
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+
 import { API_BASE, AUTH_TIMESTAMP, fullApiUrl } from "@/utils/constants";
 import { baseHeaders, safeJsonParse } from "@/utils/request";
 import DataConnector from "./dataConnector";
@@ -19,7 +21,7 @@ const System = {
   },
   totalIndexes: async function (slug = null) {
     const url = new URL(`${fullApiUrl()}/system/system-vectors`);
-    if (!!slug) url.searchParams.append("slug", encodeURIComponent(slug));
+    if (slug) url.searchParams.append("slug", encodeURIComponent(slug));
     return await fetch(url.toString(), {
       headers: baseHeaders(),
     })
@@ -504,6 +506,94 @@ const System = {
         return false;
       });
   },
+  downloadModel: async function (
+    provider,
+    modelName,
+    apiKey = null,
+    basePath = null,
+    handleChat = () => null
+  ) {
+    const ctrl = new AbortController();
+    await fetchEventSource(`${API_BASE}/system/download_model`, {
+      method: "POST",
+      body: JSON.stringify({ provider, modelName, apiKey, basePath }),
+      headers: baseHeaders(),
+      signal: ctrl.signal,
+      openWhenHidden: true,
+      async onopen(response) {
+        if (response.ok) {
+          return;
+        } else if (
+          response.status >= 400 &&
+          response.status < 500 &&
+          response.status !== 429
+        ) {
+          handleChat({
+            type: "abort",
+            textResponse: null,
+            sources: [],
+            close: true,
+            error: `An error occurred while streaming response. Code ${response.status}`,
+          });
+          ctrl.abort();
+          throw new Error("Invalid Status code response.");
+        } else {
+          handleChat({
+            type: "abort",
+            textResponse: null,
+            sources: [],
+            close: true,
+            error: `An error occurred while streaming response. Unknown Error.`,
+          });
+          ctrl.abort();
+          throw new Error("Unknown error");
+        }
+      },
+      async onmessage(msg) {
+        try {
+          const chatResult = JSON.parse(msg.data);
+          handleChat(chatResult);
+        } catch {}
+      },
+      onerror(err) {
+        handleChat({
+          type: "abort",
+          textResponse: null,
+          sources: [],
+          close: true,
+          error: `An error occurred while streaming response. ${err.message}`,
+        });
+        ctrl.abort();
+        throw new Error();
+      },
+    });
+  },
+  deleteModel: async function (
+    provider,
+    modelName,
+    apiKey = null,
+    basePath = null,
+    timeout = null
+  ) {
+    const controller = new AbortController();
+    if (timeout) {
+      setTimeout(() => {
+        controller.abort("Request timed out.");
+      }, timeout);
+    }
+
+    await fetch(`${API_BASE}/system/delete_model`, {
+      method: "POST",
+      headers: baseHeaders(),
+      signal: controller.signal,
+      body: JSON.stringify({
+        provider,
+        modelName,
+        apiKey,
+        basePath,
+      }),
+    });
+  },
   customModels: async function (
     provider,
     apiKey = null,
@@ -511,7 +601,7 @@ const System = {
     timeout = null
   ) {
     const controller = new AbortController();
-    if (!!timeout) {
+    if (timeout) {
       setTimeout(() => {
         controller.abort("Request timed out.");
       }, timeout);

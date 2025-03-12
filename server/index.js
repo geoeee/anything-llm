@@ -3,6 +3,8 @@ process.env.NODE_ENV === "development"
   : require("dotenv").config();
 
 require("./utils/logger")();
+const os = require("os");
+const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -27,6 +29,9 @@ const { experimentalEndpoints } = require("./endpoints/experimental");
 const { browserExtensionEndpoints } = require("./endpoints/browserExtension");
 const { communityHubEndpoints } = require("./endpoints/communityHub");
 const { agentFlowEndpoints } = require("./endpoints/agentFlows");
+
+const { loadConf } = require("./utils/files/conf");
+
 const app = express();
 const apiRouter = express.Router();
 const FILE_LIMIT = "3GB";
@@ -41,11 +46,17 @@ app.use(
   })
 );
 
-if (!!process.env.ENABLE_HTTPS) {
+if (process.env.ENABLE_HTTPS) {
   bootSSL(app, process.env.SERVER_PORT || 3001);
 } else {
   require("@mintplex-labs/express-ws").default(app); // load WebSockets in non-SSL mode.
 }
+
+loadConf({
+  // LLM_PROVIDER: "ollama",
+  // OLLAMA_BASE_PATH: "http://127.0.0.1:11434",
+  // OLLAMA_MODEL_PREF: "qwen2.5:0.5b",
+});
 
 app.use("/api", apiRouter);
 systemEndpoints(apiRouter);

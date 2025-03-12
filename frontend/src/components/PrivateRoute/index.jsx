@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { FullScreenLoader } from "../Preloader";
 import validateSessionTokenForUser from "@/utils/session";
 import paths from "@/utils/paths";
@@ -31,8 +31,7 @@ function useIsAuthenticated() {
       if (
         !MultiUserMode &&
         !RequiresAuth && // Not in Multi-user AND no password set.
-        !LLMProvider &&
-        !VectorDB
+        (!LLMProvider || !VectorDB)
       ) {
         setShouldRedirectToOnboarding(true);
         setIsAuthed(true);
@@ -86,23 +85,42 @@ function useIsAuthenticated() {
 export function AdminRoute({ Component, hideUserMenu = false }) {
   const { isAuthd, shouldRedirectToOnboarding, multiUserMode } =
     useIsAuthenticated();
-  if (isAuthd === null) return <FullScreenLoader />;
 
-  if (shouldRedirectToOnboarding) {
-    return <Navigate to={paths.onboarding.home()} />;
-  }
+  const navigate = useNavigate();
 
-  const user = userFromStorage();
-  return isAuthd && (user?.role === "admin" || !multiUserMode) ? (
-    hideUserMenu ? (
-      <Component />
-    ) : (
-      <UserMenu>
-        <Component />
-      </UserMenu>
-    )
+  useEffect(() => {
+    if (shouldRedirectToOnboarding) {
+      setTimeout(() => {
+        navigate("/settings/llm-preference");
+      }, 100);
+    }
+  }, [navigate, shouldRedirectToOnboarding]);
+
+  // if (isAuthd === null) return <FullScreenLoader />;
+
+  // if (shouldRedirectToOnboarding) {
+  //   return <Navigate to={paths.onboarding.home()} />;
+  // }
+
+  // const user = userFromStorage();
+  // return isAuthd && (user?.role === "admin" || !multiUserMode) ? (
+  //   hideUserMenu ? (
+  //     <Component />
+  //   ) : (
+  //     <UserMenu>
+  //       <Component />
+  //     </UserMenu>
+  //   )
+  // ) : (
+  //   <Navigate to={paths.home()} />
+  // );
+
+  return hideUserMenu ? (
+    <Component />
   ) : (
-    <Navigate to={paths.home()} />
+    <UserMenu>
+      <Component />
+    </UserMenu>
   );
 }
 
@@ -111,35 +129,68 @@ export function AdminRoute({ Component, hideUserMenu = false }) {
 export function ManagerRoute({ Component }) {
   const { isAuthd, shouldRedirectToOnboarding, multiUserMode } =
     useIsAuthenticated();
-  if (isAuthd === null) return <FullScreenLoader />;
 
-  if (shouldRedirectToOnboarding) {
-    return <Navigate to={paths.onboarding.home()} />;
-  }
+  const navigate = useNavigate();
 
-  const user = userFromStorage();
-  return isAuthd && (user?.role !== "default" || !multiUserMode) ? (
+  useEffect(() => {
+    if (shouldRedirectToOnboarding) {
+      setTimeout(() => {
+        navigate("/settings/llm-preference");
+      }, 100);
+    }
+  }, [navigate, shouldRedirectToOnboarding]);
+
+  // if (isAuthd === null) return <FullScreenLoader />;
+
+  // if (shouldRedirectToOnboarding) {
+  //   return <Navigate to={paths.onboarding.home()} />;
+  // }
+
+  // const user = userFromStorage();
+  // return isAuthd && (user?.role !== "default" || !multiUserMode) ? (
+  //   <UserMenu>
+  //     <Component />
+  //   </UserMenu>
+  // ) : (
+  //   <Navigate to={paths.home()} />
+  // );
+
+  return (
     <UserMenu>
       <Component />
     </UserMenu>
-  ) : (
-    <Navigate to={paths.home()} />
   );
 }
 
 export default function PrivateRoute({ Component }) {
   const { isAuthd, shouldRedirectToOnboarding } = useIsAuthenticated();
-  if (isAuthd === null) return <FullScreenLoader />;
+  const navigate = useNavigate();
 
-  if (shouldRedirectToOnboarding) {
-    return <Navigate to="/onboarding" />;
-  }
+  useEffect(() => {
+    if (shouldRedirectToOnboarding) {
+      setTimeout(() => {
+        navigate("/settings/llm-preference");
+      }, 100);
+    }
+  }, [navigate, shouldRedirectToOnboarding]);
 
-  return isAuthd ? (
+  // if (isAuthd === null) return <FullScreenLoader />;
+
+  // if (shouldRedirectToOnboarding) {
+  //   return <Navigate to="/onboarding" />;
+  // }
+
+  // return isAuthd ? (
+  //   <UserMenu>
+  //     <Component />
+  //   </UserMenu>
+  // ) : (
+  //   <Navigate to={paths.login(true)} />
+  // );
+
+  return (
     <UserMenu>
       <Component />
     </UserMenu>
-  ) : (
-    <Navigate to={paths.login(true)} />
   );
 }
