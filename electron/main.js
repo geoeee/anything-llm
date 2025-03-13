@@ -104,11 +104,13 @@ const ollamaProcess = spawn(
   {
     env: {
       ...process.env,
-      OLLAMA_HOST: "0.0.0.0:11435"
+      OLLAMA_HOST: "127.0.0.1:11434"
     }
   }
 );
 trackProcess(ollamaProcess);
+
+console.log("[Ollama] Process started on host:", process.env.OLLAMA_HOST || "127.0.0.1:11434");
 
 ollamaProcess.on("error", (err) => {
   console.error("Ollama process error:", err);

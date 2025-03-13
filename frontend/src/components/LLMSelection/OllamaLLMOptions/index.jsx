@@ -40,14 +40,14 @@ const SUPPORT_MODELS = [
       {
         id: "qwen2.5:0.5b",
         name: "Qwen-2.5:0.5b",
-        size: "0.7GB",
+        size: "0.4GB",
         description:
           "DeepSeek's first-generation of reasoning models with comparable performance.",
       },
       {
         id: "qwen2.5:1.5b",
         name: "Qwen-2.5:1.5b",
-        size: "1.1GB",
+        size: "0.9GB",
         description:
           "DeepSeek's first-generation of reasoning models with comparable performance and improved scalability.",
       },
