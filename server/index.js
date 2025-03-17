@@ -137,6 +137,10 @@ if (process.env.NODE_ENV !== "development") {
   });
 }
 
+app.use("/health", function (_, response) {
+  response.status(200).text("OK").end();
+});
+
 app.all("*", function (_, response) {
   response.sendStatus(404);
 });

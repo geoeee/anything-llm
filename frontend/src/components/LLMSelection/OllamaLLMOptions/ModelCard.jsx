@@ -80,11 +80,11 @@ export default function DeepSeekModels({
             </div>
             <div className="relative mt-2 text-gray-500 text-sm">
               <p className="line-clamp-2 overflow-hidden inline">
-                {model.description.length > 75
-                  ? model.description.slice(0, 70) + "..."
+                {model.description.length > 48
+                  ? model.description.slice(0, 43) + "..."
                   : model.description}
               </p>
-              {model.description.length > 75 && (
+              {model.description.length > 48 && (
                 <span
                   className="text-blue-500 text-sm cursor-pointer hover:underline inline"
                   onMouseEnter={() => setHoveredModel(model.id)}
@@ -94,10 +94,14 @@ export default function DeepSeekModels({
                 </span>
               )}
               {hoveredModel === model.id && (
-                <div className="absolute z-10 p-2 bg-white text-white text-xs rounded shadow-md w-56 mt-1">
+                <div className="absolute z-10 p-2 bg-white text-white text-xs rounded shadow-md w-70 mt-1">
                   {model.description}
                 </div>
               )}
+            </div>
+            <div className="relative mt-2 text-gray-500 text-sm">
+              <span className="font-bold">推荐配置:</span>{" "}
+              {model.recommended || "-"}
             </div>
             <div className="mt-4 flex items-center justify-between">
               <label className="text-blue-500 border border-blue-500 px-3 py-1 rounded-full text-xs">

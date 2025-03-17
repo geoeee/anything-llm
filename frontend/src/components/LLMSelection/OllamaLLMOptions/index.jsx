@@ -7,6 +7,12 @@ import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDis
 import { Tooltip } from "react-tooltip";
 import DeepSeekModels from "@/components/LLMSelection/OllamaLLMOptions/ModelCard";
 
+const DEEPSEEK_DESC =
+  "深度求索（DeepSeek）推出的首代推理大模型在性能上已可媲美OpenAI的o1模型。该系列包含六款精心打造的密集模型，其技术突破源于两大创新路径：一方面基于业界领先的Llama和Qwen开源架构进行深度优化，另一方面通过自研的DeepSeek-R1模型进行知识蒸馏，最终实现了模型性能的跨越式提升。";
+
+const QWEN_DESC =
+  "通义千问2.5版本大模型基于阿里巴巴集团最新构建的海量训练数据集进行预训练，数据规模高达18万亿语言单元（token）。该模型在技术能力上实现三大突破：上下文窗口扩展至128K超长文本处理规模，可精准解析相当于30万汉字的内容；语言支持覆盖近百种主流语言，在跨语种理解和生成任务中展现卓越性能；通过全栈技术革新，在逻辑推理和复杂问题解决能力上取得突破性提升。";
+
 const SUPPORT_MODELS = [
   {
     category: "DeepSeek",
@@ -15,22 +21,22 @@ const SUPPORT_MODELS = [
         id: "deepseek-r1:1.5b",
         name: "DeepSeek-R1:1.5B",
         size: "1.1GB",
-        description:
-          "DeepSeek's first-generation of reasoning models with comparable performance.",
+        recommended: "RTX 3060",
+        description: DEEPSEEK_DESC,
       },
       {
         id: "deepseek-r1:7b",
         name: "DeepSeek-R1:7B",
-        size: "4.9GB",
-        description:
-          "DeepSeek's first-generation of reasoning models with comparable performance and improved scalability.",
+        size: "4.7GB",
+        recommended: "RTX 3090",
+        description: DEEPSEEK_DESC,
       },
       {
         id: "deepseek-r1:14b",
         name: "DeepSeek-R1:14B",
         size: "9.0GB",
-        description:
-          "DeepSeek's first-generation of reasoning models with enhanced capabilities for complex problem-solving.",
+        recommended: "RTX 4090",
+        description: DEEPSEEK_DESC,
       },
     ],
   },
@@ -39,17 +45,24 @@ const SUPPORT_MODELS = [
     models: [
       {
         id: "qwen2.5:0.5b",
-        name: "Qwen-2.5:0.5b",
+        name: "Qwen-2.5:0.5B",
         size: "0.4GB",
-        description:
-          "DeepSeek's first-generation of reasoning models with comparable performance.",
+        recommended: "RTX 3050",
+        description: QWEN_DESC,
       },
       {
         id: "qwen2.5:1.5b",
-        name: "Qwen-2.5:1.5b",
-        size: "0.9GB",
-        description:
-          "DeepSeek's first-generation of reasoning models with comparable performance and improved scalability.",
+        name: "Qwen-2.5:1.5B",
+        size: "1GB",
+        recommended: "RTX 3060",
+        description: QWEN_DESC,
+      },
+      {
+        id: "qwen2.5:7b",
+        name: "Qwen-2.5:7B",
+        size: "4.7GB",
+        recommended: "RTX 3090",
+        description: QWEN_DESC,
       },
     ],
   },

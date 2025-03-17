@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, MenuItem } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { fork, spawn } from "child_process";
@@ -15,12 +15,13 @@ if (__dirname.indexOf("app.asar") >= 0) {
   console.log("change root path to", __dirname);
 }
 
-let mainWindow;
+let mainWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 800
+    height: 800,
+    icon: path.join(__dirname, "icon.ico"),
   });
 
   // 加载Vite开发服务器或生产构建
@@ -34,6 +35,56 @@ function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  initMenus();
+}
+
+function createAboutWindow() {
+  const aboutWindow = new BrowserWindow({
+    width: 800,
+    height: 460,
+    resizable: false,
+    alwaysOnTop: true,
+    modal: true,
+    frame: true,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+    },
+    icon: path.join(__dirname, "icon.ico"),
+  });
+
+  aboutWindow.loadFile(path.join(__dirname, "about.html"));
+
+  // 监听窗口关闭事件
+  aboutWindow.on("closed", () => {
+    aboutWindow.destroy();
+  });
+}
+
+function initMenus() {
+  const defaultMenu = Menu.getApplicationMenu();
+  if (defaultMenu) {
+    const helpMenuItem = defaultMenu.items.find(
+      (item) => item.label.toLowerCase() === "help"
+    );
+
+    if (helpMenuItem && helpMenuItem.submenu) {
+      helpMenuItem.submenu.clear();
+
+      helpMenuItem.submenu.append(
+        new MenuItem({
+          label: "About",
+          click: () => {
+            console.log("More button clicked");
+            createAboutWindow();
+          },
+        })
+      );
+
+      Menu.setApplicationMenu(defaultMenu);
+    }
+  }
 }
 
 const childProcesses = [];
@@ -46,77 +97,103 @@ function trackProcess(process) {
   });
 }
 
-console.log("[server path]", path.join(__dirname, "../server/index.js"));
-const serverProcess = fork(path.join(__dirname, "../server/index.js"), {
-  env: {
-    ...process.env,
-    NODE_ENV: "production",
-  },
-});
-
-console.log(
-  "[frontend path]",
-  path.join(__nativeDirname, "frontend-server.js")
-);
-const frontendServerProcess = fork(
-  path.join(__nativeDirname, "frontend-server.js"),
-  {
+function initServerProcesses() {
+  console.log("[server path]", path.join(__dirname, "../server/index.js"));
+  const serverProcess = fork(path.join(__dirname, "../server/index.js"), {
     env: {
       ...process.env,
       NODE_ENV: "production",
     },
-  }
-);
-trackProcess(frontendServerProcess);
-trackProcess(serverProcess);
+  });
+  serverProcess.on("error", (err) => {
+    console.error("Server process error:", err);
+  });
+  console.log("Server process started", "NODE ENV: ", process.env.NODE_ENV);
+  console.log(
+    "Server process started",
+    "STORAGE DIR ENV: ",
+    process.env.STORAGE_DIR
+  );
+  trackProcess(serverProcess);
 
-console.log("Server process started", "NODE ENV: ", process.env.NODE_ENV);
-console.log(
-  "Server process started",
-  "STORAGE DIR ENV: ",
-  process.env.STORAGE_DIR
-);
-console.log(
-  "Server process started",
-  "STORAGE DIR: ",
-  path.join(__dirname, "../storage")
-);
-serverProcess.on("error", (err) => {
-  console.error("Server process error:", err);
-});
-
-console.log("[collector path]", path.join(__dirname, "../collector/index.js"));
-const collectorProcess = fork(path.join(__dirname, "../collector/index.js"), {
-  env: {
-    ...process.env,
-    NODE_ENV: "production",
-  },
-});
-trackProcess(collectorProcess);
-
-collectorProcess.on("error", (err) => {
-  console.error("Collector process error:", err);
-});
-
-const ollamaProcess = spawn(
-  path.join(__dirname, "../ollama/ollama.exe"),
-  ["serve"],
-  {
+  console.log(
+    "[collector path]",
+    path.join(__dirname, "../collector/index.js")
+  );
+  const collectorProcess = fork(path.join(__dirname, "../collector/index.js"), {
     env: {
       ...process.env,
-      OLLAMA_HOST: "127.0.0.1:11434"
+      NODE_ENV: "production",
+    },
+  });
+  collectorProcess.on("error", (err) => {
+    console.error("Collector process error:", err);
+  });
+  console.log(
+    "Server process started",
+    "STORAGE DIR: ",
+    path.join(__dirname, "../storage")
+  );
+  trackProcess(collectorProcess);
+  const ollamaProcess = spawn(
+    path.join(__dirname, "../ollama/ollama.exe"),
+    ["serve"],
+    {
+      env: {
+        ...process.env,
+        OLLAMA_HOST: "127.0.0.1:11434",
+      },
     }
+  );
+  console.log(
+    "[Ollama] Process started on host:",
+    process.env.OLLAMA_HOST || "127.0.0.1:11434"
+  );
+
+  ollamaProcess.on("error", (err) => {
+    console.error("Ollama process error:", err);
+  });
+  trackProcess(ollamaProcess);
+}
+
+function initFrontServer() {
+  console.log(
+    "[frontend path]",
+    path.join(__nativeDirname, "frontend-server.js")
+  );
+  const frontendServerProcess = fork(
+    path.join(__nativeDirname, "frontend-server.js"),
+    {
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+      },
+    }
+  );
+  trackProcess(frontendServerProcess);
+}
+
+function checkAndCreateWindow() {
+  if (mainWindow !== null) {
+    return;
   }
-);
-trackProcess(ollamaProcess);
+  const checkServer = fetch("http://127.0.0.1/3001");
+  const checkCollector = fetch("http://127.0.0.1/8888");
+  const checkOllama = fetch("http://127.0.0.1/11434");
+  Promise.all([checkServer, checkCollector, checkOllama])
+    .then(() => {
+      createWindow();
+    })
+    .catch(() => {
+      console.error("Server not started");
+      setTimeout(checkAndCreateWindow, 1000);
+    });
+}
 
-console.log("[Ollama] Process started on host:", process.env.OLLAMA_HOST || "127.0.0.1:11434");
+initServerProcesses();
+initFrontServer();
 
-ollamaProcess.on("error", (err) => {
-  console.error("Ollama process error:", err);
-});
-
-app.whenReady().then(createWindow);
+app.whenReady().then(checkAndCreateWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -147,5 +224,5 @@ process.on("exit", () => {
 });
 
 app.on("activate", () => {
-  if (mainWindow === null) createWindow();
+  checkAndCreateWindow();
 });

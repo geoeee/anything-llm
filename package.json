@@ -37,8 +37,8 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.anythingllm.app",
-    "productName": "AnythingLLM",
+    "appId": "com.model_run.app",
+    "productName": "ModelRUN",
     "directories": {
       "output": "dist"
     },
@@ -78,8 +78,8 @@
     ],
     "nsis": {
       "packElevateHelper": false,
-      "artifactName": "AnythingLLM_${version}.exe",
-      "uninstallDisplayName": "AnythingLLM_Desktop",
+      "artifactName": "ModelRUN_${version}.exe",
+      "uninstallDisplayName": "ModelRUN_LLM",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "runAfterFinish": false,
