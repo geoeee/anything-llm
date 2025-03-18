@@ -177,7 +177,7 @@ function checkAndCreateWindow() {
   if (mainWindow !== null) {
     return;
   }
-  const checkServer = fetch("http://localhost:3001");
+  const checkServer = fetch("http://127.0.0.1:3001/health");
   const checkCollector = fetch("http://127.0.0.1:8888");
   const checkOllama = fetch("http://127.0.0.1:11434");
   Promise.all([checkServer, checkCollector, checkOllama])
