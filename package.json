@@ -39,6 +39,7 @@
   "build": {
     "appId": "com.model_run.app",
     "productName": "ModelRUN",
+    "icon": "electron/icon.ico",
     "directories": {
       "output": "dist"
     },
