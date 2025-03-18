@@ -54,9 +54,8 @@ function createAboutWindow() {
     icon: path.join(__dirname, "icon.ico"),
   });
 
-  aboutWindow.loadFile(path.join(__dirname, "about.html"));
+  aboutWindow.loadFile(path.join(app.getAppPath(), "electron", "about.html"));
 
-  // 监听窗口关闭事件
   aboutWindow.on("closed", () => {
     aboutWindow.destroy();
   });
