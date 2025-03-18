@@ -374,7 +374,7 @@ const TRANSLATIONS = {
   llm: {
     title: "LLM 首选项",
     description:
-      "这些是你首选的 LLM 聊天和嵌入提供商的凭据和设置。重要的是，这些密钥是最新的和正确的，否则 AnythingLLM 将无法正常运行。",
+      "这些是你首选的 LLM 聊天设置。重要的是，下载和选用模型，否则聊天将无法正常运行。",
     provider: "LLM 提供商",
   },
   transcription: {
