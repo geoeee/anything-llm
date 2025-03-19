@@ -52,10 +52,17 @@ if (process.env.ENABLE_HTTPS) {
   require("@mintplex-labs/express-ws").default(app); // load WebSockets in non-SSL mode.
 }
 
+const isProd = process.env.NODE_ENV === "production";
+console.log("NODE_ENV", process.env.NODE_ENV);
+const STORAGE_DIR =
+  process.env.STORAGE_DIR || (isProd ? path.join(__dirname, "storage") : "");
+console.log("STORAGE_DIR", STORAGE_DIR);
+
 loadConf({
   LLM_PROVIDER: "ollama",
   OLLAMA_BASE_PATH: "http://127.0.0.1:11434",
   VECTOR_DB: "lancedb",
+  STORAGE_DIR: STORAGE_DIR,
   // OLLAMA_MODEL_PREF: "qwen2.5:0.5b",
 });
 
