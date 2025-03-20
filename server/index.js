@@ -1,11 +1,11 @@
+const Logger = require("./log-helper");
+Logger.initLogger();
+
 process.env.NODE_ENV === "development"
   ? require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` })
   : require("dotenv").config();
 
-const Logger = require("./log-helper");
-Logger.initLogger();
-
-require("./utils/logger")();
+// require("./utils/logger")();
 const os = require("os");
 const fs = require("fs");
 const express = require("express");
