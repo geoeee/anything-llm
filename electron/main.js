@@ -16,6 +16,7 @@ if (__dirname.indexOf("app.asar") >= 0) {
 }
 
 let mainWindow = null;
+let loadingWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -58,6 +59,30 @@ function createAboutWindow() {
 
   aboutWindow.on("closed", () => {
     aboutWindow.destroy();
+  });
+}
+
+function createLoadingWindow() {
+  loadingWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    resizable: false,
+    alwaysOnTop: true,
+    modal: true,
+    frame: true,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+    },
+    icon: path.join(__dirname, "icon.ico"),
+  });
+
+  loadingWindow.loadFile(
+    path.join(app.getAppPath(), "electron", "loading.html")
+  );
+
+  loadingWindow.on("closed", () => {
+    loadingWindow.destroy();
   });
 }
 
@@ -173,6 +198,9 @@ function initFrontServer() {
 }
 
 function checkAndCreateWindow() {
+  if (loadingWindow === null) {
+    createLoadingWindow();
+  }
   if (mainWindow !== null) {
     return;
   }
@@ -181,6 +209,10 @@ function checkAndCreateWindow() {
   const checkOllama = fetch("http://127.0.0.1:11434");
   Promise.all([checkServer, checkCollector, checkOllama])
     .then(() => {
+      if (loadingWindow) {
+        loadingWindow.close();
+      }
+      loadingWindow = null;
       createWindow();
     })
     .catch(() => {

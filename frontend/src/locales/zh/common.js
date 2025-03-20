@@ -6,8 +6,7 @@ const TRANSLATIONS = {
     },
     llm: {
       title: "LLM 偏好",
-      description:
-        "AnythingLLM 可以与多家 LLM 提供商合作。这将是处理聊天的服务。",
+      description: "ModelRun 可以与多家 LLM 提供商合作。这将是处理聊天的服务。",
     },
     userSetup: {
       title: "用户设置",
@@ -33,14 +32,14 @@ const TRANSLATIONS = {
       settingsHint: "这些设置可以随时在设置中重新配置。",
     },
     survey: {
-      title: "欢迎使用 AnythingLLM",
-      description: "帮助我们为你的需求打造 AnythingLLM。可选。",
+      title: "欢迎使用 ModelRun",
+      description: "帮助我们为你的需求打造 ModelRun。可选。",
       email: "你的电子邮件是什么？",
-      useCase: "你将如何使用 AnythingLLM？",
+      useCase: "你将如何使用 ModelRun？",
       useCaseWork: "用于工作",
       useCasePersonal: "用于个人使用",
       useCaseOther: "其他",
-      comment: "你是如何听说 AnythingLLM 的？",
+      comment: "你是如何听说 ModelRun 的？",
       commentPlaceholder:
         "Reddit，Twitter，GitHub，YouTube 等 - 让我们知道你是如何找到我们的！",
       skip: "跳过调查",
@@ -48,7 +47,7 @@ const TRANSLATIONS = {
     },
     workspace: {
       title: "创建你的第一个工作区",
-      description: "创建你的第一个工作区并开始使用 AnythingLLM。",
+      description: "创建你的第一个工作区并开始使用 ModelRun。",
     },
   },
   common: {
@@ -119,11 +118,11 @@ const TRANSLATIONS = {
   },
   welcomeMessage: {
     part1:
-      "欢迎使用 AnythingLLM，AnythingLLM 是由 Mintplex Labs 开发的开源 AI 工具，可以将任何东西转换为你可以查询和聊天的训练有素的聊天机器人。AnythingLLM 是一款 BYOK（自带密钥）软件，因此除了你想使用的服务外，此软件不收取订阅费、费用或其他费用。",
+      "欢迎使用 ModelRun，ModelRun 是由 Mintplex Labs 开发的开源 AI 工具，可以将任何东西转换为你可以查询和聊天的训练有素的聊天机器人。ModelRun 是一款 BYOK（自带密钥）软件，因此除了你想使用的服务外，此软件不收取订阅费、费用或其他费用。",
     part2:
-      "AnythingLLM 是将强大的 AI 产品（如 OpenAi、GPT-4、LangChain、PineconeDB、ChromaDB 等）整合在一个整洁的包中而无需繁琐操作的最简单方法，可以将你的生产力提高 100 倍。",
+      "ModelRun 是将强大的 AI 产品（如 OpenAi、GPT-4、LangChain、PineconeDB、ChromaDB 等）整合在一个整洁的包中而无需繁琐操作的最简单方法，可以将你的生产力提高 100 倍。",
     part3:
-      "AnythingLLM 可以完全在你的本地计算机上运行，几乎没有开销，你甚至不会注意到它的存在！无需 GPU。也可以进行云端和本地安装。\nAI 工具生态系统每天都在变得更强大。AnythingLLM 使其易于使用。",
+      "ModelRun 可以完全在你的本地计算机上运行，几乎没有开销，你甚至不会注意到它的存在！无需 GPU。也可以进行云端和本地安装。\nAI 工具生态系统每天都在变得更强大。ModelRun 使其易于使用。",
     githubIssue: "在 GitHub 上创建问题",
     user1: "我该如何开始?!",
     part4:
@@ -164,7 +163,7 @@ const TRANSLATIONS = {
       add: "添加新消息",
       save: "保存消息",
       heading: "向我解释",
-      body: "AnythingLLM 的好处",
+      body: "ModelRun 的好处",
     },
     pfp: {
       title: "助手个人资料图像",
@@ -348,7 +347,7 @@ const TRANSLATIONS = {
       system: "系统",
       user: "用户",
       message: "消息",
-      assistant: "AnythingLLM 聊天助手",
+      assistant: "ModelRun 聊天助手",
       "double-click": "双击以编辑...",
       save: "保存消息",
     },
@@ -362,7 +361,7 @@ const TRANSLATIONS = {
   // API 密钥
   api: {
     title: "API 密钥",
-    description: "API 密钥允许持有者以编程方式访问和管理此 AnythingLLM 实例。",
+    description: "API 密钥允许持有者以编程方式访问和管理此 ModelRun 实例。",
     link: "阅读 API 文档",
     generate: "生成新的 API 密钥",
     table: {
@@ -383,7 +382,7 @@ const TRANSLATIONS = {
       "这些是你的首选转录模型提供商的凭据和设置。重要的是这些密钥是最新且正确的，否则媒体文件和音频将无法转录。",
     provider: "转录提供商",
     "warn-start":
-      "在 RAM 或 CPU 有限的计算机上使用本地耳语模型可能会在处理媒体文件时停止 AnythingLLM。",
+      "在 RAM 或 CPU 有限的计算机上使用本地耳语模型可能会在处理媒体文件时停止 ModelRun。",
     "warn-recommend": "我们建议至少 2GB RAM 并上传 <10Mb 的文件。",
     "warn-end": "内置模型将在首次使用时自动下载。",
   },
@@ -392,10 +391,10 @@ const TRANSLATIONS = {
     "desc-start":
       "当使用本身不支持嵌入引擎的 LLM 时，你可能需要额外指定用于嵌入文本的凭据。",
     "desc-end":
-      "嵌入是将文本转换为矢量的过程。需要这些凭据才能将你的文件和提示转换为 AnythingLLM 可以用来处理的格式。",
+      "嵌入是将文本转换为矢量的过程。需要这些凭据才能将你的文件和提示转换为 ModelRun 可以用来处理的格式。",
     provider: {
       title: "嵌入提供商",
-      description: "使用 AnythingLLM 的本机嵌入引擎时不需要设置。",
+      description: "使用 ModelRun 的本机嵌入引擎时不需要设置。",
     },
   },
   text: {
@@ -420,7 +419,7 @@ const TRANSLATIONS = {
   vector: {
     title: "向量数据库",
     description:
-      "这些是 AnythingLLM 实例如何运行的凭据和设置。重要的是，这些密钥是最新的和正确的。",
+      "这些是 ModelRun 实例如何运行的凭据和设置。重要的是，这些密钥是最新的和正确的。",
     provider: {
       title: "向量数据库提供商",
       description: "LanceDB 不需要任何配置。",
@@ -464,7 +463,7 @@ const TRANSLATIONS = {
     password: {
       title: "密码保护",
       description:
-        "用密码保护你的AnythingLLM实例。如果你忘记了密码，那么没有恢复方法，所以请确保保存这个密码。",
+        "用密码保护你的ModelRun实例。如果你忘记了密码，那么没有恢复方法，所以请确保保存这个密码。",
     },
     instance: {
       title: "实例密码保护",
@@ -487,8 +486,7 @@ const TRANSLATIONS = {
   // 隐私与数据处理
   privacy: {
     title: "隐私与数据处理",
-    description:
-      "这是你对如何处理连接的第三方提供商和AnythingLLM的数据的配置。",
+    description: "这是你对如何处理连接的第三方提供商和ModelRun的数据的配置。",
     llm: "LLM 选择",
     embedding: "嵌入首选项",
     vector: "向量数据库",
@@ -639,22 +637,22 @@ const TRANSLATIONS = {
       fetching: "获取中...",
       "fetch-website": "抓取网站",
       "privacy-notice":
-        "这些文件将上传到此 AnythingLLM 实例上运行的文档处理器。这些文件不会发送或共享给第三方。",
+        "这些文件将上传到此 ModelRun 实例上运行的文档处理器。这些文件不会发送或共享给第三方。",
     },
     pinning: {
       what_pinning: "什么是文档钉选？",
       pin_explained_block1:
-        "当你在 AnythingLLM 中 <b>钉选</b> 文档时，我们将把文档的全部内容注入到你的提示窗口中，以便 LLM 能够完全理解其内容。",
+        "当你在 ModelRun 中 <b>钉选</b> 文档时，我们将把文档的全部内容注入到你的提示窗口中，以便 LLM 能够完全理解其内容。",
       pin_explained_block2:
         "这最适合与 <b>大上下文模型</b> 一起使用，或者用于对知识库至关重要的小文件。",
       pin_explained_block3:
-        "如果你对 AnythingLLM 的默认回答不满意，那么钉选是提高回答质量的绝佳方式。",
+        "如果你对 ModelRun 的默认回答不满意，那么钉选是提高回答质量的绝佳方式。",
       accept: "好的，明白了",
     },
     watching: {
       what_watching: "观看文档有什么作用？",
       watch_explained_block1:
-        "当你在 AnythingLLM 中 <b>观看</b> 文档时，我们将 <i>自动</i> 从其原始来源定期同步文档内容。这将自动更新每个管理此文件的工作区中的内容。",
+        "当你在 ModelRun 中 <b>观看</b> 文档时，我们将 <i>自动</i> 从其原始来源定期同步文档内容。这将自动更新每个管理此文件的工作区中的内容。",
       watch_explained_block2:
         "此功能目前仅支持在线内容，不适用于手动上传的文档。",
       watch_explained_block3_start: "你可以从 ",

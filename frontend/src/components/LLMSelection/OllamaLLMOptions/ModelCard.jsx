@@ -100,7 +100,7 @@ export default function DeepSeekModels({
               )}
             </div>
             <div className="relative mt-2 text-gray-500 text-sm">
-              <span className="font-bold">推荐配置:</span>{" "}
+              <span className="font-bold">最低推荐配置:</span>{" "}
               {model.recommended || "-"}
             </div>
             <div className="mt-4 flex items-center justify-between">
