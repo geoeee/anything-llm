@@ -12,3 +12,4 @@ yarn.lock
 .idea
 
 dist/
+ollama/models

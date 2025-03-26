@@ -59,6 +59,8 @@ const {
 const { simpleSSOEnabled } = require("../utils/middleware/simpleSSOEnabled");
 const { TemporaryAuthToken } = require("../models/temporaryAuthToken");
 
+let lastDownloadModel = null;
+
 function systemEndpoints(app) {
   if (!app) return;
 
@@ -975,6 +977,31 @@ function systemEndpoints(app) {
     }
   });
 
+  app.post("/system/download_model_info", async (request, response) => {
+    const id = uuidv4();
+    try {
+      const { provider, apiKey = null, basePath = null } = reqBody(request);
+      const providerInst = getLLMProvider(provider, apiKey, basePath);
+
+      if (!providerInst?.getModelDownloadingInfo) {
+        response.status(400).json({
+          id,
+          type: "abort",
+          textResponse: null,
+          sources: [],
+          close: true,
+          error: "Cannot get model download info.",
+        });
+        return;
+      }
+      const downloadInfo = providerInst.getModelDownloadingInfo();
+      response.status(200).json(downloadInfo || {});
+    } catch (e) {
+      console.error(e);
+      response.status(500).end();
+    }
+  });
+
   app.post("/system/download_model", async (request, response) => {
     const id = uuidv4();
     try {
@@ -1005,6 +1032,7 @@ function systemEndpoints(app) {
       response.flushHeaders();
 
       await providerInst.downloadModel(modelName, (progress = {}) => {
+        lastDownloadModel = modelName;
         writeResponseChunk(response, {
           id,
           type: "progress",
@@ -1018,7 +1046,6 @@ function systemEndpoints(app) {
           close: false,
         });
       });
-
       response.end();
     } catch (e) {
       console.error(e);
@@ -1032,6 +1059,7 @@ function systemEndpoints(app) {
       });
       response.end();
     }
+    lastDownloadModel = null;
   });
 
   app.post(

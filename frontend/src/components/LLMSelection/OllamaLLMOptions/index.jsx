@@ -21,21 +21,21 @@ const SUPPORT_MODELS = [
         id: "deepseek-r1:1.5b",
         name: "DeepSeek-R1:1.5B",
         size: "1.1GB",
-        recommended: "RTX 3060",
+        recommended: "1.5-2 GB",
         description: DEEPSEEK_DESC,
       },
       {
         id: "deepseek-r1:7b",
         name: "DeepSeek-R1:7B",
         size: "4.7GB",
-        recommended: "RTX 3090",
+        recommended: "7-10 GB",
         description: DEEPSEEK_DESC,
       },
       {
         id: "deepseek-r1:14b",
         name: "DeepSeek-R1:14B",
         size: "9.0GB",
-        recommended: "RTX 4090",
+        recommended: "14-20 GB",
         description: DEEPSEEK_DESC,
       },
     ],
@@ -47,21 +47,21 @@ const SUPPORT_MODELS = [
         id: "qwen2.5:0.5b",
         name: "Qwen-2.5:0.5B",
         size: "0.4GB",
-        recommended: "RTX 3050",
+        recommended: "0.5-1 GB",
         description: QWEN_DESC,
       },
       {
         id: "qwen2.5:1.5b",
         name: "Qwen-2.5:1.5B",
         size: "1GB",
-        recommended: "RTX 3060",
+        recommended: "1.5-2 GB",
         description: QWEN_DESC,
       },
       {
         id: "qwen2.5:7b",
         name: "Qwen-2.5:7B",
         size: "4.7GB",
-        recommended: "RTX 3090",
+        recommended: "7-10 GB",
         description: QWEN_DESC,
       },
     ],
@@ -80,6 +80,7 @@ const DEFAULT_CONF = {
 
 export default function OllamaLLMOptions({ settings }) {
   const [tempSettings, setTempSettings] = useState(settings || {});
+  const [downloadCtrl, setDownloadCtrl] = useState(null);
   const {
     autoDetecting,
     basePath,
@@ -108,6 +109,15 @@ export default function OllamaLLMOptions({ settings }) {
   useState(() => {
     setTempSettings(settings);
   }, settings);
+
+  useEffect(() => {
+    const ctrl = downloadCtrl;
+    return () => {
+      if (ctrl) {
+        ctrl.abort();
+      }
+    };
+  }, [downloadCtrl]);
 
   const findCustomModels = useCallback(async () => {
     if (!basePath?.value) {
@@ -153,38 +163,58 @@ export default function OllamaLLMOptions({ settings }) {
     setTempSettings(_settings);
   };
 
-  const onDownload = async (modelName) => {
-    setDownloadInfo({
-      modelName,
-      percent: 0,
-    });
-    await System.downloadModel(
-      "ollama",
-      modelName,
-      authToken.value,
-      basePath.value,
-      (data) => {
-        const source = data?.sources?.[0];
-        console.log(source);
-        if (source.status.includes("pulling")) {
-          source.status = "下载中";
-          source.showPercent = true;
-        } else if (source.status.includes("verifying")) {
-          source.status = "校验中";
-        } else if (source.status.includes("writing")) {
-          source.status = "写入中";
-        } else if (source.status.includes("success")) {
-          source.status = "下载完成";
-        } else {
-          source.status = "--";
-        }
+  const onDownload = useCallback(
+    async (modelName) => {
+      setDownloadInfo({
+        modelName,
+        percent: 0,
+      });
+      const { ctrl, task } = System.downloadModel(
+        "ollama",
+        modelName,
+        authToken.value,
+        basePath.value,
+        (data) => {
+          const source = data?.sources?.[0];
+          console.log(source);
+          if (source.status.includes("pulling")) {
+            source.status = "下载中";
+            source.showPercent = true;
+          } else if (source.status.includes("verifying")) {
+            source.status = "校验中";
+          } else if (source.status.includes("writing")) {
+            source.status = "写入中";
+          } else if (source.status.includes("success")) {
+            source.status = "下载完成";
+          } else {
+            source.status = "--";
+          }
 
-        setDownloadInfo(source || {});
+          setDownloadInfo(source || {});
+        }
+      );
+      setDownloadCtrl(ctrl);
+      await task;
+      setDownloadInfo({});
+      await findCustomModels();
+    },
+    [authToken.value, basePath.value, findCustomModels]
+  );
+
+  const restoreDownloadInfo = useCallback(async () => {
+    try {
+      const lastDownloadInfo = await System.getModelDownloadInfo();
+      if (lastDownloadInfo?.modelName) {
+        onDownload(lastDownloadInfo?.modelName);
       }
-    );
-    setDownloadInfo({});
-    await findCustomModels();
-  };
+    } catch (e) {
+      console.error(e);
+    }
+  }, [onDownload]);
+
+  useEffect(() => {
+    restoreDownloadInfo();
+  }, [restoreDownloadInfo]);
 
   return (
     <div className="w-full flex flex-col gap-y-7">
@@ -383,7 +413,11 @@ export default function OllamaLLMOptions({ settings }) {
           <DeepSeekModels
             key={category.category}
             category={category}
-            activate={tempSettings.OllamaLLMModelPref}
+            activate={
+              customModels.find(
+                (model) => model.name === tempSettings.OllamaLLMModelPref
+              ) && tempSettings.OllamaLLMModelPref
+            }
             availableModels={customModels.map((model) => model.name)}
             downloadInfo={downloadInfo}
             onDelete={onDelete}

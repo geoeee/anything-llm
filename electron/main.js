@@ -166,6 +166,7 @@ function initServerProcesses() {
       env: {
         ...process.env,
         OLLAMA_HOST: "127.0.0.1:11434",
+        OLLAMA_MODELS: path.join(__dirname, "../ollama/models"),
       },
     }
   );

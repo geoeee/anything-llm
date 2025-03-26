@@ -506,15 +506,15 @@ const System = {
         return false;
       });
   },
-  downloadModel: async function (
+  downloadModel: function (
     provider,
     modelName,
     apiKey = null,
     basePath = null,
-    handleChat = () => null
+    downloadInfoCallback = () => null
   ) {
     const ctrl = new AbortController();
-    await fetchEventSource(`${API_BASE}/system/download_model`, {
+    const task = fetchEventSource(`${API_BASE}/system/download_model`, {
       method: "POST",
       body: JSON.stringify({ provider, modelName, apiKey, basePath }),
       headers: baseHeaders(),
@@ -528,7 +528,7 @@ const System = {
           response.status < 500 &&
           response.status !== 429
         ) {
-          handleChat({
+          downloadInfoCallback({
             type: "abort",
             textResponse: null,
             sources: [],
@@ -538,7 +538,7 @@ const System = {
           ctrl.abort();
           throw new Error("Invalid Status code response.");
         } else {
-          handleChat({
+          downloadInfoCallback({
             type: "abort",
             textResponse: null,
             sources: [],
@@ -552,11 +552,13 @@ const System = {
       async onmessage(msg) {
         try {
           const chatResult = JSON.parse(msg.data);
-          handleChat(chatResult);
-        } catch {}
+          downloadInfoCallback(chatResult);
+        } catch (e) {
+          console.error(e);
+        }
       },
       onerror(err) {
-        handleChat({
+        downloadInfoCallback({
           type: "abort",
           textResponse: null,
           sources: [],
@@ -567,6 +569,46 @@ const System = {
         throw new Error();
       },
     });
+    return {
+      ctrl,
+      task,
+    };
+  },
+  getModelDownloadInfo: async function (
+    provider,
+    modelName,
+    apiKey = null,
+    basePath = null,
+    timeout = null
+  ) {
+    const controller = new AbortController();
+    if (timeout) {
+      setTimeout(() => {
+        controller.abort("Request timed out.");
+      }, timeout);
+    }
+
+    return fetch(`${API_BASE}/system/download_model_info`, {
+      method: "POST",
+      headers: baseHeaders(),
+      signal: controller.signal,
+      body: JSON.stringify({
+        provider,
+        modelName,
+        apiKey,
+        basePath,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.statusText || "Get model download info error.");
+        }
+        return res.json();
+      })
+      .catch((e) => {
+        console.error(e);
+        return { apiKey: null, error: e.message };
+      });
   },
   deleteModel: async function (
     provider,

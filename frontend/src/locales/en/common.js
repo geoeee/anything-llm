@@ -705,8 +705,7 @@ const TRANSLATIONS = {
       "processor-offline-desc":
         "We can't upload your files right now because the document processor is offline. Please try again later.",
       "click-upload": "Click to upload or drag and drop",
-      "file-types":
-        "supports text files, csv's, spreadsheets, audio files, and more!",
+      "file-types": "supports text files, csv's, spreadsheets, and more!",
       "or-submit-link": "or submit a link",
       "placeholder-link": "https://example.com",
       fetching: "Fetching...",

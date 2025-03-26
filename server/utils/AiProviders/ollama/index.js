@@ -11,6 +11,8 @@ const {
 } = require("../../helpers/chat/LLMPerformanceMonitor");
 const { Ollama } = require("ollama");
 
+let currentDownloadInfo = null;
+
 // Docs: https://github.com/jmorganca/ollama/blob/main/docs/api.md
 class OllamaAILLM {
   constructor(embedder = null, modelPreference = null) {
@@ -212,6 +214,10 @@ class OllamaAILLM {
     await this.client.delete({ model: modelName });
   }
 
+  getModelDownloadingInfo() {
+    return currentDownloadInfo;
+  }
+
   async downloadModel(modelName, progressFunc = () => null) {
     console.log(`downloading ${modelName}...`);
     // let currentDigestDone = false;
@@ -222,32 +228,29 @@ class OllamaAILLM {
         if (part.completed && part.total) {
           percent = Math.round((part.completed / part.total) * 100);
         }
-        // process.stdout.clearLine(0);
-        // process.stdout.cursorTo(0);
-        // process.stdout.write(`${part.status} ${percent}%...`);
-        progressFunc({
+        const downloadInfo = {
+          modelName,
           percent,
           total: part.total,
           completed: part.completed,
           status: part.status,
           digest: part.digest,
-        });
-        // if (percent === 100 && !currentDigestDone) {
-        //   console.log();
-        //   currentDigestDone = true;
-        // } else {
-        //   currentDigestDone = false;
-        // }
+        };
+        currentDownloadInfo = downloadInfo;
+        progressFunc(downloadInfo);
       } else {
-        progressFunc({
+        const downloadInfo = {
+          modelName,
           total: part.total,
           completed: part.completed,
           status: part.status,
           digest: part.digest,
-        });
-        // console.log(part.status);
+        };
+        currentDownloadInfo = downloadInfo;
+        progressFunc(downloadInfo);
       }
     }
+    currentDownloadInfo = null;
   }
 
   /**

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./style.css";
 
 // const models = [
 //   {
@@ -100,21 +101,31 @@ export default function DeepSeekModels({
               )}
             </div>
             <div className="relative mt-2 text-gray-500 text-sm">
-              <span className="font-bold">最低推荐配置:</span>{" "}
+              <span className="font-bold">最低显存:</span>{" "}
               {model.recommended || "-"}
             </div>
-            <div className="mt-4 flex items-center justify-between">
+            <div className="mt-4 flex items-center justify-between h-[30px]">
               <label className="text-blue-500 border border-blue-500 px-3 py-1 rounded-full text-xs">
                 文本生成
               </label>
               {model.id !== activate && (
                 <>
                   {downloadInfo?.modelName === model.id && (
-                    <label className="text-xs">
-                      {downloadInfo.showPercent
-                        ? `${downloadInfo.status} ${downloadInfo.percent ? `${downloadInfo.percent}%` : ""} `
-                        : `${downloadInfo.status}`}
-                    </label>
+                    <div className="download-progress-container">
+                      <div className="progress-bar">
+                        <div
+                          className="progress-bar-fill"
+                          style={{ width: `${downloadInfo.percent}%` }}
+                        ></div>
+                        <div className="progress-bar-gradient"></div>
+                        <div className="progress-text">
+                          {downloadInfo.status || "准备中"}{" "}
+                          {downloadInfo.percent
+                            ? `${downloadInfo.percent}%`
+                            : ""}
+                        </div>
+                      </div>
+                    </div>
                   )}
                   {downloadInfo?.modelName !== model.id && (
                     <>
