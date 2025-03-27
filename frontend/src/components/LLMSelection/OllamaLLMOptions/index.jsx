@@ -6,6 +6,7 @@ import { CaretDown, CaretUp, Info } from "@phosphor-icons/react";
 import useProviderEndpointAutoDiscovery from "@/hooks/useProviderEndpointAutoDiscovery";
 import { Tooltip } from "react-tooltip";
 import DeepSeekModels from "@/components/LLMSelection/OllamaLLMOptions/ModelCard";
+import "./style.css";
 
 const DEEPSEEK_DESC =
   "深度求索（DeepSeek）推出的首代推理大模型在性能上已可媲美OpenAI的o1模型。该系列包含六款精心打造的密集模型，其技术突破源于两大创新路径：一方面基于业界领先的Llama和Qwen开源架构进行深度优化，另一方面通过自研的DeepSeek-R1模型进行知识蒸馏，最终实现了模型性能的跨越式提升。";
@@ -21,21 +22,21 @@ const SUPPORT_MODELS = [
         id: "deepseek-r1:1.5b",
         name: "DeepSeek-R1:1.5B",
         size: "1.1GB",
-        recommended: "1.5-2 GB",
+        recommended: "4 GB+",
         description: DEEPSEEK_DESC,
       },
       {
         id: "deepseek-r1:7b",
         name: "DeepSeek-R1:7B",
         size: "4.7GB",
-        recommended: "7-10 GB",
+        recommended: "8 GB+",
         description: DEEPSEEK_DESC,
       },
       {
         id: "deepseek-r1:14b",
         name: "DeepSeek-R1:14B",
         size: "9.0GB",
-        recommended: "14-20 GB",
+        recommended: "16 GB+",
         description: DEEPSEEK_DESC,
       },
     ],
@@ -47,21 +48,21 @@ const SUPPORT_MODELS = [
         id: "qwen2.5:0.5b",
         name: "Qwen-2.5:0.5B",
         size: "0.4GB",
-        recommended: "0.5-1 GB",
+        recommended: "2 GB+",
         description: QWEN_DESC,
       },
       {
         id: "qwen2.5:1.5b",
         name: "Qwen-2.5:1.5B",
         size: "1GB",
-        recommended: "1.5-2 GB",
+        recommended: "4 GB+",
         description: QWEN_DESC,
       },
       {
         id: "qwen2.5:7b",
         name: "Qwen-2.5:7B",
         size: "4.7GB",
-        recommended: "7-10 GB",
+        recommended: "8 GB+",
         description: QWEN_DESC,
       },
     ],
@@ -81,6 +82,7 @@ const DEFAULT_CONF = {
 export default function OllamaLLMOptions({ settings }) {
   const [tempSettings, setTempSettings] = useState(settings || {});
   const [downloadCtrl, setDownloadCtrl] = useState(null);
+  const [savePath, setSavePath] = useState(null);
   const {
     autoDetecting,
     basePath,
@@ -139,10 +141,6 @@ export default function OllamaLLMOptions({ settings }) {
     }
     setLoading(false);
   }, [basePath?.value]);
-
-  useEffect(() => {
-    findCustomModels();
-  }, [findCustomModels]);
 
   const onDelete = async (modelName) => {
     await System.deleteModel(
@@ -216,8 +214,57 @@ export default function OllamaLLMOptions({ settings }) {
     restoreDownloadInfo();
   }, [restoreDownloadInfo]);
 
+  useEffect(() => {
+    const getConf = async () => {
+      const conf = (await window?.electronAPI?.getConf()) || {};
+      setSavePath(conf["OLLAMA_MODELS"] || "");
+      findCustomModels();
+    };
+    getConf();
+  }, [findCustomModels]);
+
+  const handleFolderSelect = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const newPath = await window?.electronAPI?.selectModelFolder("ollama");
+    setSavePath(newPath);
+    findCustomModels();
+    // if (window.showDirectoryPicker) {
+    //   try {
+    //     const folderHandle = await window.showDirectoryPicker();
+    //     debugger;
+    //     console.log("选中的文件夹：", folderHandle.name);
+    //     setSavePath(folderHandle.name);
+    //   } catch (error) {
+    //     console.error("文件夹选择被取消或出错", error);
+    //   }
+    // } else {
+    //   const input = document.createElement("input");
+    //   input.type = "file";
+    //   input.webkitdirectory = true;
+    //   input.directory = true;
+
+    //   input.addEventListener("change", (event) => {
+    //     if (event.target.files && event.target.files.length > 0) {
+    //       const selectedPath = event.target.files[0].path;
+    //       setSavePath(selectedPath);
+    //     }
+    //   });
+    //   input.click();
+    // }
+  };
+
   return (
     <div className="w-full flex flex-col gap-y-7">
+      <div className="model-file-path">
+        <div className="model-storage-path">
+          <h3>模型存储位置:</h3>
+          <div className="path-display">
+            <span>{savePath || "未设置"}</span>
+          </div>
+          <button onClick={handleFolderSelect}>修改</button>
+        </div>
+      </div>
       {/* <div className="w-full flex items-start gap-[36px] mt-1.5">
         <OllamaLLMModelSelection
           settings={settings}

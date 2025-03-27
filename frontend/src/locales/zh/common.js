@@ -631,7 +631,7 @@ const TRANSLATIONS = {
       "processor-offline-desc":
         "目前无法上传文件，因为文档处理器离线。请稍后再试。",
       "click-upload": "点击上传或拖放文件",
-      "file-types": "支持文本文件、CSV、电子表格等！",
+      "file-types": "支持文本文件、PDF！",
       "or-submit-link": "或提交链接",
       "placeholder-link": "https://example.com",
       fetching: "获取中...",
