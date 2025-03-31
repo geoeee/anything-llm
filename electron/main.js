@@ -28,11 +28,11 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: path.join(__dirname, "icon.ico"),
+    icon: path.join(__nativeDirname, "icon.ico"),
     webPreferences: {
       nodeIntegration: false, // 推荐安全方式
       contextIsolation: true, // 启用上下文隔离
-      preload: __dirname + "/preload.js", // 预加载脚本
+      preload: __nativeDirname + "/preload.js", // 预加载脚本
     },
   });
 
@@ -63,7 +63,7 @@ function createAboutWindow() {
     webPreferences: {
       nodeIntegration: false,
     },
-    icon: path.join(__dirname, "icon.ico"),
+    icon: path.join(__nativeDirname, "icon.ico"),
   });
 
   aboutWindow.loadFile(path.join(app.getAppPath(), "electron", "about.html"));
@@ -85,7 +85,7 @@ function createLoadingWindow() {
     webPreferences: {
       nodeIntegration: false,
     },
-    icon: path.join(__dirname, "icon.ico"),
+    icon: path.join(__nativeDirname, "icon.ico"),
   });
 
   loadingWindow.loadFile(
